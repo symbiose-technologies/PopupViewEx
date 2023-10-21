@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-	name: "PopupView",
+	name: "PopupViewEx",
 	platforms: [
         .iOS(.v14),
         .macOS(.v11),
@@ -12,13 +12,13 @@ let package = Package(
     ],
     products: [
     	.library(
-    		name: "PopupView", 
-    		targets: ["PopupView"]
+    		name: "PopupViewEx",
+    		targets: ["PopupViewEx"]
     	)
     ],
     targets: [
     	.target(
-    		name: "PopupView",
+    		name: "PopupViewEx",
             path: "Source"
         )
     ]
