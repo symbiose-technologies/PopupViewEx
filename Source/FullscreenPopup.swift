@@ -44,7 +44,7 @@ public struct FullscreenPopup<Item: Equatable, PopupContent: View>: ViewModifier
     /// called when when dismiss animation ends
     var userDismissCallback: (DismissSource) -> ()
 
-    var params: Popup<PopupContent>.PopupParameters
+    var params: Popup_Ex.PopupParameters
 
     var view: (() -> PopupContent)!
     var itemView: ((Item) -> PopupContent)!
@@ -86,7 +86,7 @@ public struct FullscreenPopup<Item: Equatable, PopupContent: View>: ViewModifier
     init(isPresented: Binding<Bool> = .constant(false),
          item: Binding<Item?> = .constant(nil),
          isBoolMode: Bool,
-         params: Popup<PopupContent>.PopupParameters,
+         params: Popup_Ex.PopupParameters,
          view: (() -> PopupContent)?,
          itemView: ((Item) -> PopupContent)?) {
         self._isPresented = isPresented
@@ -207,8 +207,8 @@ public struct FullscreenPopup<Item: Equatable, PopupContent: View>: ViewModifier
         return nil
     }
 
-    private func getModifier() -> Popup<PopupContent> {
-        Popup(
+    private func getModifier() -> PopupEx<PopupContent> {
+        PopupEx(
             params: params,
             view: viewForItem != nil ? viewForItem! : view,
             shouldShowContent: shouldShowContent,

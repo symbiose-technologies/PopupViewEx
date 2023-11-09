@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import PopupView
+import PopupViewEx
 
 class SomeItem: Equatable {
     

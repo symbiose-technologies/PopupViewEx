@@ -7,7 +7,7 @@
 //
 
 import SwiftUI
-import PopupView
+import PopupViewEx
 
 struct ExampleButton : View {
 

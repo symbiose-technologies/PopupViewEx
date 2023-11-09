@@ -16,9 +16,9 @@ public enum DismissSource {
     case autohide
 }
 
-public struct Popup<PopupContent: View>: ViewModifier {
+public struct PopupEx<PopupContent: View>: ViewModifier {
 
-    init(params: Popup<PopupContent>.PopupParameters,
+    init(params: Popup_Ex.PopupParameters,
          view: @escaping () -> PopupContent,
          shouldShowContent: Bool,
          showContent: Bool,
@@ -46,236 +46,7 @@ public struct Popup<PopupContent: View>: ViewModifier {
         self.dismissCallback = dismissCallback
     }
     
-    public enum PopupType {
-        case `default`
-        case toast
-        case floater(verticalPadding: CGFloat = 10, horizontalPadding: CGFloat = 10, useSafeAreaInset: Bool = true)
 
-        var defaultPosition: Position {
-            if case .default = self {
-                return .center
-            }
-            return .bottom
-        }
-
-        var verticalPadding: CGFloat {
-            if case let .floater(verticalPadding, _, _) = self {
-                return verticalPadding
-            }
-            return 0
-        }
-
-        var horizontalPadding: CGFloat {
-            if case let .floater(_, horizontalPadding, _) = self {
-                return horizontalPadding
-            }
-            return 0
-        }
-
-        var useSafeAreaInset: Bool {
-            if case let .floater(_, _, use) = self {
-                return use
-            }
-            return false
-        }
-    }
-
-    public enum Position {
-        case topLeading
-        case top
-        case topTrailing
-
-        case leading
-        case center // usual popup
-        case trailing
-
-        case bottomLeading
-        case bottom
-        case bottomTrailing
-
-        var isTop: Bool {
-            [.topLeading, .top, .topTrailing].contains(self)
-        }
-
-        var isVerticalCenter: Bool {
-            [.leading, .center, .trailing].contains(self)
-        }
-
-        var isBottom: Bool {
-            [.bottomLeading, .bottom, .bottomTrailing].contains(self)
-        }
-
-        var isLeading: Bool {
-            [.topLeading, .leading, .bottomLeading].contains(self)
-        }
-
-        var isHorizontalCenter: Bool {
-            [.top, .center, .bottom].contains(self)
-        }
-
-        var isTrailing: Bool {
-            [.topTrailing, .trailing, .bottomTrailing].contains(self)
-        }
-    }
-
-    public enum AppearFrom {
-        case top
-        case bottom
-        case left
-        case right
-    }
-
-    public struct PopupParameters {
-        var type: PopupType = .default
-
-        var position: Position?
-
-        var appearFrom: AppearFrom?
-
-        var animation: Animation = .easeOut(duration: 0.3)
-
-        /// If nil - never hides on its own
-        var autohideIn: Double?
-
-        /// Should allow dismiss by dragging - default is `true`
-        var dragToDismiss: Bool = true
-
-        /// Should close on tap - default is `true`
-        var closeOnTap: Bool = true
-
-        /// Should close on tap outside - default is `false`
-        var closeOnTapOutside: Bool = false
-
-        /// Background color for outside area
-        var backgroundColor: Color = .clear
-
-        /// Custom background view for outside area
-        var backgroundView: AnyView?
-
-        /// If true - taps do not pass through popup's background and the popup is displayed on top of navbar
-        var isOpaque: Bool = false
-
-        /// move up for keyboardHeight when it is displayed
-        var useKeyboardSafeArea: Bool = false
-
-        /// called when when dismiss animation starts
-        var willDismissCallback: (DismissSource) -> () = {_ in}
-
-        /// called when when dismiss animation ends
-        var dismissCallback: (DismissSource) -> () = {_ in}
-
-        public func type(_ type: PopupType) -> PopupParameters {
-            var params = self
-            params.type = type
-            return params
-        }
-
-        public func position(_ position: Position) -> PopupParameters {
-            var params = self
-            params.position = position
-            return params
-        }
-
-        public func appearFrom(_ appearFrom: AppearFrom) -> PopupParameters {
-            var params = self
-            params.appearFrom = appearFrom
-            return params
-        }
-
-        public func animation(_ animation: Animation) -> PopupParameters {
-            var params = self
-            params.animation = animation
-            return params
-        }
-
-        public func autohideIn(_ autohideIn: Double?) -> PopupParameters {
-            var params = self
-            params.autohideIn = autohideIn
-            return params
-        }
-
-        /// Should allow dismiss by dragging - default is `true`
-        public func dragToDismiss(_ dragToDismiss: Bool) -> PopupParameters {
-            var params = self
-            params.dragToDismiss = dragToDismiss
-            return params
-        }
-
-        /// Should close on tap - default is `true`
-        public func closeOnTap(_ closeOnTap: Bool) -> PopupParameters {
-            var params = self
-            params.closeOnTap = closeOnTap
-            return params
-        }
-
-        /// Should close on tap outside - default is `false`
-        public func closeOnTapOutside(_ closeOnTapOutside: Bool) -> PopupParameters {
-            var params = self
-            params.closeOnTapOutside = closeOnTapOutside
-            return params
-        }
-
-        public func backgroundColor(_ backgroundColor: Color) -> PopupParameters {
-            var params = self
-            params.backgroundColor = backgroundColor
-            return params
-        }
-
-        public func backgroundView<BackgroundView: View>(_ backgroundView: ()->(BackgroundView)) -> PopupParameters {
-            var params = self
-            params.backgroundView = AnyView(backgroundView())
-            return params
-        }
-
-        public func isOpaque(_ isOpaque: Bool) -> PopupParameters {
-            var params = self
-            params.isOpaque = isOpaque
-            return params
-        }
-
-        public func useKeyboardSafeArea(_ useKeyboardSafeArea: Bool) -> PopupParameters {
-            var params = self
-            params.useKeyboardSafeArea = useKeyboardSafeArea
-            return params
-        }
-
-        // MARK: - dismiss callbacks
-
-        public func willDismissCallback(_ dismissCallback: @escaping (DismissSource) -> ()) -> PopupParameters {
-            var params = self
-            params.willDismissCallback = dismissCallback
-            return params
-        }
-
-        public func willDismissCallback(_ dismissCallback: @escaping () -> ()) -> PopupParameters {
-            var params = self
-            params.willDismissCallback = { _ in
-                dismissCallback()
-            }
-            return params
-        }
-
-        @available(*, deprecated, renamed: "dismissCallback")
-        public func dismissSourceCallback(_ dismissCallback: @escaping (DismissSource) -> ()) -> PopupParameters {
-            var params = self
-            params.dismissCallback = dismissCallback
-            return params
-        }
-
-        public func dismissCallback(_ dismissCallback: @escaping (DismissSource) -> ()) -> PopupParameters {
-            var params = self
-            params.dismissCallback = dismissCallback
-            return params
-        }
-
-        public func dismissCallback(_ dismissCallback: @escaping () -> ()) -> PopupParameters {
-            var params = self
-            params.dismissCallback = { _ in
-                dismissCallback()
-            }
-            return params
-        }
-    }
 
     private enum DragState {
         case inactive
@@ -302,8 +73,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
 
     // MARK: - Public Properties
 
-    var position: Position
-    var appearFrom: AppearFrom?
+    var position: Popup_Ex.Position
+    var appearFrom: Popup_Ex.AppearFrom?
     var verticalPadding: CGFloat
     var horizontalPadding: CGFloat
     var useSafeAreaInset: Bool
@@ -441,8 +212,8 @@ public struct Popup<PopupContent: View>: ViewModifier {
         shouldShowContent ? CGPoint(x: displayedOffsetX, y: displayedOffsetY) : hiddenOffset
     }
 
-    private var calculatedAppearFrom: AppearFrom {
-        let from: AppearFrom
+    private var calculatedAppearFrom: Popup_Ex.AppearFrom {
+        let from: Popup_Ex.AppearFrom
         if let appearFrom = appearFrom {
             from = appearFrom
         } else if position.isLeading {
